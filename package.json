@@ -1,16 +1,24 @@
 {
-  "name": "bangla-pronouncer",
+  "name": "bangla-pronounce-ai",
   "version": "1.0.0",
-  "description": "Gemini powered Bangla pronunciation",
+  "description": "Text to Bangla Pronunciation using Gemini API",
   "main": "server.js",
+  "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
+  "keywords": [
+    "express",
+    "gemini",
+    "glassmorphism"
+  ],
+  "author": "User",
+  "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "node-fetch": "^3.3.2"
-  },
-  "type": "module"
+  }
 }
