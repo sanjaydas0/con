@@ -1,88 +1,355 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-<meta charset="UTF-8">
-<title>Bangla Pronouncer</title>
-<link href="https://fonts.googleapis.com/css2?family=Merienda&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=SolaimanLipi&display=swap" rel="stylesheet">
-<style>
-/* ====== Reset & Fonts ====== */
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Merienda', cursive;background:#f0f4f8;display:flex;justify-content:center;align-items:center;min-height:100vh;transition:0.5s;}
-body.dark{background:#121212;color:#f0f0f0;}
-.container{background:rgba(255,255,255,0.3);backdrop-filter:blur(20px);border-radius:25px;padding:40px;max-width:600px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.15);text-align:center;transition:0.5s;}
-body.dark .container{background:rgba(30,30,30,0.4);box-shadow:0 10px 40px rgba(0,0,0,0.4);}
-h1{font-family:'SolaimanLipi', sans-serif;color:#333;margin-bottom:25px;transition:0.5s;}
-body.dark h1{color:#fff;}
-textarea{width:100%;min-height:120px;padding:15px;border-radius:15px;border:none;font-size:18px;font-family:'Merienda', cursive;outline:none;resize:none;box-shadow:inset 0 0 15px rgba(0,0,0,0.05);transition:0.3s;}
-body.dark textarea{background:#222;color:#fff;box-shadow:inset 0 0 15px rgba(255,255,255,0.05);}
-button{margin-top:20px;padding:12px 30px;font-size:18px;border:none;border-radius:15px;background:linear-gradient(45deg,#ff5f7e,#ff8fa3);color:white;cursor:pointer;transition:0.3s;}
-button:hover{transform:scale(1.05);}
-.output{margin-top:25px;background:rgba(255,255,255,0.25);backdrop-filter:blur(15px);padding:20px;border-radius:20px;font-size:20px;min-height:80px;color:#222;position:relative;transition:0.5s;}
-body.dark .output{background:rgba(50,50,50,0.3);color:#fff;}
-.copy-btn{position:absolute;top:10px;right:10px;background:#ff5f7e;border:none;color:white;padding:5px 10px;border-radius:8px;font-size:14px;cursor:pointer;opacity:0.8;transition:0.3s;}
-.copy-btn:hover{opacity:1;transform:scale(1.1);}
-.loader{border:4px solid #f3f3f3;border-top:4px solid #ff5f7e;border-radius:50%;width:25px;height:25px;animation:spin 1s linear infinite;display:inline-block;margin-left:10px;vertical-align:middle;}
-@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-.toggle-mode{position:absolute;top:20px;right:20px;background:#ff5f7e;color:white;padding:8px 15px;border-radius:12px;cursor:pointer;transition:0.3s;}
-.toggle-mode:hover{transform:scale(1.05);}
-span.emoji{font-size:22px;margin-right:5px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বাংলা উচ্চারণ কনভার্টার | AI Powered</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;600&family=Merienda:wght@300..900&display=swap" rel="stylesheet">
+
+    <style>
+        /* বেসিক রিসেট এবং ভেরিয়েবল */
+        :root {
+            --primary-color: #6366f1;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-main: #ffffff;
+            --text-secondary: #e2e8f0;
+            --font-bangla: 'Hind Siliguri', sans-serif;
+            --font-english: 'Merienda', cursive;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-bangla);
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-main);
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* ব্যাকগ্রাউন্ড অর্বস (Orbs) ডেকোরেশন */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 10s infinite ease-in-out;
+        }
+        .orb-1 { width: 300px; height: 300px; background: #4f46e5; top: -50px; left: -50px; }
+        .orb-2 { width: 250px; height: 250px; background: #ec4899; bottom: -50px; right: -50px; animation-delay: 2s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 40px); }
+        }
+
+        /* মেইন কন্টেইনার - Glassmorphism */
+        .container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        /* হেডার সেকশন */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-family: var(--font-english);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* ইনপুট এরিয়া */
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 15px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-family: var(--font-bangla);
+            resize: none;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #818cf8;
+            box-shadow: 0 0 15px rgba(129, 140, 248, 0.2);
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* বাটন ডিজাইন */
+        .btn-convert {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: var(--font-english);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-convert:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
+        }
+
+        .btn-convert:active {
+            transform: scale(0.98);
+        }
+
+        /* লোডার (Loader) */
+        .loader {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #fff;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* আউটপুট বক্স */
+        .output-container {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            position: relative;
+            display: none; /* শুরুতে লুকানো */
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        .output-label {
+            font-family: var(--font-english);
+            font-size: 0.9rem;
+            color: #a5b4fc;
+        }
+
+        .output-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #e0e7ff;
+            white-space: pre-wrap;
+        }
+
+        /* কপি বাটন */
+        .btn-copy {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-copy:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* মোবাইল রেসপন্সিভ */
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="toggle-mode" onclick="toggleMode()">🌙 Dark Mode</div>
-<div class="container">
-<h1>ইংরেজি → বাংলা উচ্চারণ</h1>
-<textarea id="eng" placeholder="যেকোনো ইংরেজি লিখুন…" oninput="livePreview()"></textarea>
-<button onclick="convert()">Convert</button>
-<div class="output" id="out">
-এখানে উচ্চারণ দেখাবে…
-<button class="copy-btn" onclick="copyOutput()">Copy</button>
-</div>
-</div>
 
-<script>
-function toggleMode(){
-    document.body.classList.toggle("dark");
-    const btn = document.querySelector(".toggle-mode");
-    btn.innerText = document.body.classList.contains("dark") ? "☀ Light Mode" : "🌙 Dark Mode";
-}
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
 
-async function convert(){
-    const txt = document.getElementById("eng").value.trim();
-    const out = document.getElementById("out");
-    if(!txt){ out.innerHTML="কিছু লিখুন…<button class='copy-btn' onclick='copyOutput()'>Copy</button>"; return; }
+    <div class="container">
+        <header>
+            <h1>Ucharon AI</h1>
+            <p class="subtitle">ইংরেজি বা অন্য টেক্সট লিখুন, সঠিক বাংলা উচ্চারণ পান।</p>
+        </header>
 
-    out.innerHTML="লোড হচ্ছে <span class='loader'></span><button class='copy-btn' onclick='copyOutput()'>Copy</button>";
+        <main>
+            <div class="input-group">
+                <textarea id="inputText" placeholder="এখানে লিখুন... (যেমন: Hello World)"></textarea>
+            </div>
 
-    try{
-        const res = await fetch("/convert",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({ text: txt })
+            <button id="convertBtn" class="btn-convert">
+                <span id="btnText">উচ্চারণ দেখুন</span>
+                <span class="loader" id="loader"></span>
+                <span>✨</span>
+            </button>
+
+            <div id="outputContainer" class="output-container">
+                <div class="output-header">
+                    <span class="output-label">Bangla Pronunciation</span>
+                    <button class="btn-copy" id="copyBtn" onclick="copyText()">
+                        📋 Copy
+                    </button>
+                </div>
+                <div id="outputText" class="output-text"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // এলিমেন্ট সিলেকশন
+        const convertBtn = document.getElementById('convertBtn');
+        const inputText = document.getElementById('inputText');
+        const outputContainer = document.getElementById('outputContainer');
+        const outputText = document.getElementById('outputText');
+        const loader = document.getElementById('loader');
+        const btnText = document.getElementById('btnText');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // কনভার্ট বাটনে ক্লিক ইভেন্ট
+        convertBtn.addEventListener('click', async () => {
+            const text = inputText.value.trim();
+
+            // ইনপুট না থাকলে এলার্ট
+            if (!text) {
+                alert('দয়া করে কিছু টেক্সট লিখুন!');
+                return;
+            }
+
+            // লোডিং স্টেট শুরু
+            setLoading(true);
+            outputContainer.style.display = 'none';
+
+            try {
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // রেজাল্ট দেখানো
+                    outputText.textContent = data.result;
+                    outputContainer.style.display = 'block';
+                } else {
+                    outputText.textContent = 'এরর: ' + (data.error || 'সার্ভার সমস্যা');
+                    outputContainer.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('সার্ভারের সাথে সংযোগ স্থাপন করা যাচ্ছে না।');
+            } finally {
+                // লোডিং স্টেট শেষ
+                setLoading(false);
+            }
         });
-        const data = await res.json();
-        const emojis = ["🅰️","🅱️","🌟","🔥","💫"];
-        const highlighted = data.output.split(" ").map(w=>emojis[Math.floor(Math.random()*emojis.length)]+" "+w).join(" ");
-        out.innerHTML=highlighted + "<button class='copy-btn' onclick='copyOutput()'>Copy</button>";
-    } catch(err){
-        console.error(err);
-        out.innerHTML="Server Error!<button class='copy-btn' onclick='copyOutput()'>Copy</button>";
-    }
-}
 
-function copyOutput(){
-    const text = document.getElementById("out").innerText.replace("Copy","");
-    navigator.clipboard.writeText(text).then(()=>alert("Copy successful!"));
-}
+        // লোডিং হ্যান্ডলার ফাংশন
+        function setLoading(isLoading) {
+            if (isLoading) {
+                loader.style.display = 'inline-block';
+                btnText.textContent = 'প্রসেসিং...';
+                convertBtn.disabled = true;
+                convertBtn.style.opacity = '0.7';
+            } else {
+                loader.style.display = 'none';
+                btnText.textContent = 'উচ্চারণ দেখুন';
+                convertBtn.disabled = false;
+                convertBtn.style.opacity = '1';
+            }
+        }
 
-// Real-time preview
-function livePreview(){
-    const txt = document.getElementById("eng").value.trim();
-    const out = document.getElementById("out");
-    if(txt) out.innerHTML="📝 "+txt+"<button class='copy-btn' onclick='copyOutput()'>Copy</button>";
-    else out.innerHTML="এখানে উচ্চারণ দেখাবে…<button class='copy-btn' onclick='copyOutput()'>Copy</button>";
-}
-</script>
+        // কপি ফাংশন
+        function copyText() {
+            const textToCopy = outputText.textContent;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅ Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Copy failed', err);
+            });
+        }
+    </script>
 </body>
 </html>
